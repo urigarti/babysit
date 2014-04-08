@@ -1,5 +1,8 @@
-package com.community.babysit;
+package com.community.babysit.widgethandlers;
 
+import com.community.babysit.R;
+import com.community.babysit.R.id;
+import com.community.babysit.R.layout;
 import com.community.babysit.util.SystemUiHider;
 
 import android.annotation.TargetApi;
@@ -7,8 +10,12 @@ import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnKeyListener;
+import android.widget.EditText;
+import android.widget.Toast;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -44,15 +51,20 @@ public class FullscreenActivity extends Activity {
      * The instance of the {@link SystemUiHider} for this activity.
      */
     private SystemUiHider mSystemUiHider;
+    private EditText edittext;
 
+    
+   
+   
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_fullscreen);
+//        setContentView(R.layout.activity_fullscreen);
 
-        final View controlsView = findViewById(R.id.fullscreen_content_controls);
-        final View contentView = findViewById(R.id.fullscreen_content);
+//        final View controlsView = findViewById(R.id.fullscreen_content_controls);
+//        final View contentView = findViewById(R.id.fullscreen_content);
+        final View contentView = findViewById(R.id.home);
 
         // Set up an instance of SystemUiHider to control the system UI for
         // this activity.
@@ -73,20 +85,20 @@ public class FullscreenActivity extends Activity {
                             // in-layout UI controls at the bottom of the
                             // screen.
                             if (mControlsHeight == 0) {
-                                mControlsHeight = controlsView.getHeight();
+//                                mControlsHeight = controlsView.getHeight();
                             }
                             if (mShortAnimTime == 0) {
                                 mShortAnimTime = getResources().getInteger(
                                         android.R.integer.config_shortAnimTime);
                             }
-                            controlsView.animate()
-                                    .translationY(visible ? 0 : mControlsHeight)
-                                    .setDuration(mShortAnimTime);
+//                            controlsView.animate()
+//                                    .translationY(visible ? 0 : mControlsHeight)
+//                                    .setDuration(mShortAnimTime);
                         } else {
                             // If the ViewPropertyAnimator APIs aren't
                             // available, simply show or hide the in-layout UI
                             // controls.
-                            controlsView.setVisibility(visible ? View.VISIBLE : View.GONE);
+//                            controlsView.setVisibility(visible ? View.VISIBLE : View.GONE);
                         }
 
                         if (visible && AUTO_HIDE) {
@@ -97,21 +109,23 @@ public class FullscreenActivity extends Activity {
                 });
 
         // Set up the user interaction to manually show or hide the system UI.
-        contentView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (TOGGLE_ON_CLICK) {
-                    mSystemUiHider.toggle();
-                } else {
-                    mSystemUiHider.show();
-                }
-            }
-        });
+//        contentView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (TOGGLE_ON_CLICK) {
+//                    mSystemUiHider.toggle();
+//                } else {
+//                    mSystemUiHider.show();
+//                }
+//            }
+//        });
 
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
-        findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+//        findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+        
+        addKeyListener();
     }
 
     @Override
@@ -155,5 +169,38 @@ public class FullscreenActivity extends Activity {
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
+    }
+    
+    
+    public void addKeyListener() {
+    	 
+//    	// get edittext component
+//    	edittext = (EditText) findViewById(R.id.login_password);
+//     
+//    	// add a keylistener to keep track user input
+//    	edittext.setOnKeyListener(new OnKeyListener() {
+//    	public boolean onKey(View v, int keyCode, KeyEvent event) {
+//     
+//    		// if keydown and "enter" is pressed
+//    		if ((event.getAction() == KeyEvent.ACTION_DOWN)
+//    			&& (keyCode == KeyEvent.KEYCODE_ENTER)) {
+//     
+//    			// display a floating message
+//    			Toast.makeText(FullscreenActivity.this,
+//    				edittext.getText(), Toast.LENGTH_LONG).show();
+//    			return true;	
+//     
+//    		} else if ((event.getAction() == KeyEvent.ACTION_DOWN)
+//    			&& (keyCode == KeyEvent.KEYCODE_9)) {
+//     
+//    			// display a floating message
+//    			Toast.makeText(FullscreenActivity.this,
+//    				"Number 9 is pressed!", Toast.LENGTH_LONG).show();
+//    			return true;
+//    		}
+//     
+//    		return false;
+//    	}
+//     });
     }
 }
