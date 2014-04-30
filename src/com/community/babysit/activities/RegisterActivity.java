@@ -1,73 +1,146 @@
 package com.community.babysit.activities;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.community.babysit.R;
-import com.community.babysit.R.id;
-import com.community.babysit.R.layout;
-import com.community.babysit.R.menu;
+import com.community.babysit.util.http.JSonParser;
 
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
-import android.content.Intent;
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.os.Build;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
-public class RegisterActivity extends ActionBarActivity {
+public class RegisterActivity extends ActionBarActivity implements
+		OnClickListener {
+
+	private EditText user, pass;
+	private Button mRegister;
+
+	
+
+	// JSON parser class
+	JSonParser jsonParser = new JSonParser();
+
+	// php login script
+
+	// localhost :
+	// testing on your device
+	// put your local ip instead, on windows, run CMD > ipconfig
+	// or in mac's terminal type ifconfig and look for the ip under en0 or en1
+	// private static final String LOGIN_URL =
+	// "http://xxx.xxx.x.x:1234/webservice/register.php";
+
+	// testing on Emulator:
+	private static final String REGISTER_URL = "http://127.0.0.1/webservice/register.php";
+
+	// testing from a real server:
+	// private static final String LOGIN_URL =
+	// "http://www.yourdomain.com/webservice/register.php";
+
+	// ids
+	private static final String TAG_SUCCESS = "success";
+	private static final String TAG_MESSAGE = "message";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_register);
 
-		if (savedInstanceState == null) {
-			getSupportFragmentManager().beginTransaction()
-					.add(R.id.container, new PlaceholderFragment()).commit();
-		}
-		
-		Intent intent = getIntent();
-		String message = intent.getStringExtra(LoginActivity.EXTRA_EMAIL);
+		user = (EditText) findViewById(R.id.username);
+		pass = (EditText) findViewById(R.id.password);
+
+		mRegister = (Button) findViewById(R.id.register);
+		mRegister.setOnClickListener(this);
+
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.register, menu);
-		return true;
+	public void onClick(View v) {
+		new CreateUser().execute();
 	}
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
+	class CreateUser extends AsyncTask<String, String, String> {
 
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
-	public static class PlaceholderFragment extends Fragment {
+		/**
+		 * Before starting background thread Show Progress Dialog
+		 * */
+		boolean failure = false;
+		// Progress Dialog
+		private ProgressDialog pDialog;
 
-		public PlaceholderFragment() {
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			pDialog = new ProgressDialog(RegisterActivity.this);
+			pDialog.setMessage("Creating User...");
+			pDialog.setIndeterminate(false);
+			pDialog.setCancelable(true);
+			pDialog.show();
 		}
 
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_register,
-					container, false);
-			return rootView;
+		protected String doInBackground(String... args) {
+			// TODO Auto-generated method stub
+			// Check for success tag
+			int success;
+			String username = user.getText().toString();
+			String password = pass.getText().toString();
+			try {
+				// Building Parameters
+				List<NameValuePair> params = new ArrayList<NameValuePair>();
+				params.add(new BasicNameValuePair("username", username));
+				params.add(new BasicNameValuePair("password", password));
+
+				Log.d("request!", "starting");
+
+				// Posting user data to script
+				JSONObject json = jsonParser.makeHttpRequest(REGISTER_URL, "POST",
+						params);
+
+				// full json response
+				Log.d("Login attempt", json.toString());
+
+				// json success element
+				success = json.getInt(TAG_SUCCESS);
+				if (success == 1) {
+					Log.d("User Created!", json.toString());
+					finish();
+					return json.getString(TAG_MESSAGE);
+				} else {
+					Log.d("Login Failure!", json.getString(TAG_MESSAGE));
+					return json.getString(TAG_MESSAGE);
+
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+
+			return null;
+		}
+
+		/**
+		 * After completing background task Dismiss the progress dialog
+		 * **/
+		protected void onPostExecute(String file_url) {
+			// dismiss the dialog once product deleted
+			pDialog.dismiss();
+			if (file_url != null) {
+				Toast.makeText(RegisterActivity.this, file_url,
+						Toast.LENGTH_LONG).show();
+			}
 		}
 	}
-
 }
