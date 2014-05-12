@@ -1,5 +1,7 @@
 package com.community.babysit.activities;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +11,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.community.babysit.R;
+import com.community.babysit.util.GlobalConst.GlobalConstants;
 import com.community.babysit.util.http.JSonParser;
+import com.community.babysit.utils.encryption.PasswordEncryptionService;
 
 import android.support.v7.app.ActionBarActivity;
 import android.app.ProgressDialog;
@@ -43,7 +47,7 @@ public class RegisterActivity extends ActionBarActivity implements
 	// "http://xxx.xxx.x.x:1234/webservice/register.php";
 
 	// testing on Emulator:
-	private static final String REGISTER_URL = "http://127.0.0.1/webservice/register.php";
+	private static final String REGISTER_URL = "http://" + GlobalConstants.DB_IP_ADDRESS+ "/webservice/register.php";
 
 	// testing from a real server:
 	// private static final String LOGIN_URL =
@@ -80,6 +84,7 @@ public class RegisterActivity extends ActionBarActivity implements
 		boolean failure = false;
 		// Progress Dialog
 		private ProgressDialog pDialog;
+		private String encryptedPassword = "";
 
 		@Override
 		protected void onPreExecute() {
@@ -98,20 +103,34 @@ public class RegisterActivity extends ActionBarActivity implements
 			int success;
 			String username = user.getText().toString();
 			String password = pass.getText().toString();
+			String salt = "";
+			try {
+				salt = PasswordEncryptionService.generateSalt().toString();
+				encryptedPassword = PasswordEncryptionService.getEncryptedPassword(password, salt.getBytes()).toString();
+			} catch (NoSuchAlgorithmException e2) {
+			} catch (InvalidKeySpecException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			try {
 				// Building Parameters
 				List<NameValuePair> params = new ArrayList<NameValuePair>();
 				params.add(new BasicNameValuePair("username", username));
-				params.add(new BasicNameValuePair("password", password));
+				params.add(new BasicNameValuePair("password", encryptedPassword));
+				params.add(new BasicNameValuePair("pass_salt", salt));
+				params.add(new BasicNameValuePair("type", "ADMIN"));
 
 				Log.d("request!", "starting");
 
 				// Posting user data to script
 				JSONObject json = jsonParser.makeHttpRequest(REGISTER_URL, "POST",
 						params);
+				if(json == null) {
+					return null;
+				}
 
 				// full json response
-				Log.d("Login attempt", json.toString());
+				Log.d("Register attempt", json.toString());
 
 				// json success element
 				success = json.getInt(TAG_SUCCESS);
@@ -120,14 +139,13 @@ public class RegisterActivity extends ActionBarActivity implements
 					finish();
 					return json.getString(TAG_MESSAGE);
 				} else {
-					Log.d("Login Failure!", json.getString(TAG_MESSAGE));
+					Log.d("Registeration Failure!", json.getString(TAG_MESSAGE));
 					return json.getString(TAG_MESSAGE);
 
 				}
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-
 			return null;
 		}
 

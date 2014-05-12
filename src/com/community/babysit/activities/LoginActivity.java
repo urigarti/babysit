@@ -11,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.community.babysit.R;
+import com.community.babysit.util.GlobalConst.GlobalConstants;
 import com.community.babysit.util.http.JSonParser;
 import com.community.babysit.utils.encryption.PasswordEncryptionService;
 
@@ -49,7 +50,7 @@ public class LoginActivity extends Activity implements OnClickListener {
    // private static final String LOGIN_URL = "http://xxx.xxx.x.x:1234/webservice/login.php";
 
     //testing on Emulator:
-    private static final String LOGIN_URL = "http://20.0.0.6/webservice/login.php";
+    private static final String LOGIN_URL = "http://" + GlobalConstants.DB_IP_ADDRESS + "/webservice/login.php";
 
   //testing from a real server:
     //private static final String LOGIN_URL = "http://www.yourdomain.com/webservice/login.php";
@@ -57,7 +58,7 @@ public class LoginActivity extends Activity implements OnClickListener {
     //JSON element ids from repsonse of php script:
     private static final String TAG_STATUS = "status";
     private static final String TAG_MESSAGE = "message";
-
+    
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -101,6 +102,8 @@ public class LoginActivity extends Activity implements OnClickListener {
          * Before starting background thread Show Progress Dialog
          * */
 		boolean failure = false;
+		String salt = "";
+		String encryptedPass;
 
         @Override
         protected void onPreExecute() {
@@ -117,25 +120,25 @@ public class LoginActivity extends Activity implements OnClickListener {
 			// TODO Auto-generated method stub
 			 // Check for success tag
             int success;
-            String encryptedPass;
             String username = user.getText().toString();
             String password = pass.getText().toString();
-            String salt = "";
-			try {
-				salt = PasswordEncryptionService.generateSalt().toString();
-			} catch (NoSuchAlgorithmException e2) {
+//            String salt = "";
+//			try {
+//				salt = PasswordEncryptionService.generateSalt().toString();
+//			}
+//			catch (NoSuchAlgorithmException e2) {
+//				// TODO Auto-generated catch block
+//				e2.printStackTrace();
+//			}
+//            try {
+//				encryptedPass = PasswordEncryptionService.getEncryptedPassword(password, salt.getBytes()).toString();
+//			} catch (NoSuchAlgorithmException e1) {
 				// TODO Auto-generated catch block
-				e2.printStackTrace();
-			}
-            try {
-				encryptedPass = PasswordEncryptionService.getEncryptedPassword(password, salt.getBytes()).toString();
-			} catch (NoSuchAlgorithmException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (InvalidKeySpecException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+//				e1.printStackTrace();
+//			} catch (InvalidKeySpecException e1) {
+//				 TODO Auto-generated catch block
+//				e1.printStackTrace();
+//			}
             
             try {
                 // Building Parameters
@@ -143,7 +146,7 @@ public class LoginActivity extends Activity implements OnClickListener {
                 params.add(new BasicNameValuePair("username", username));
                 params.add(new BasicNameValuePair("password", password));
                 params.add(new BasicNameValuePair("type", "ADMIN"));
-                params.add(new BasicNameValuePair("pass_salt", salt));
+//                params.add(new BasicNameValuePair("pass_salt", salt));
 
                 Log.d("request!", "starting");
                 // getting product details by making HTTP request
