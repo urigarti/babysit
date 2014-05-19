@@ -1,7 +1,5 @@
 package com.community.babysit.activities;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +11,6 @@ import org.json.JSONObject;
 import com.community.babysit.R;
 import com.community.babysit.util.GlobalConst.GlobalConstants;
 import com.community.babysit.util.http.JSonParser;
-import com.community.babysit.utils.encryption.PasswordEncryptionService;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -41,19 +38,7 @@ public class LoginActivity extends Activity implements OnClickListener {
     // JSON parser class
     JSonParser jsonParser = new JSonParser();
 
-    //php login script location:
-
-    //localhost :
-    //testing on your device
-    //put your local ip instead,  on windows, run CMD > ipconfig
-    //or in mac's terminal type ifconfig and look for the ip under en0 or en1
-   // private static final String LOGIN_URL = "http://xxx.xxx.x.x:1234/webservice/login.php";
-
-    //testing on Emulator:
     private static final String LOGIN_URL = "http://" + GlobalConstants.DB_IP_ADDRESS + "/webservice/login.php";
-
-  //testing from a real server:
-    //private static final String LOGIN_URL = "http://www.yourdomain.com/webservice/login.php";
 
     //JSON element ids from repsonse of php script:
     private static final String TAG_STATUS = "status";
@@ -76,7 +61,6 @@ public class LoginActivity extends Activity implements OnClickListener {
 		//register listeners
 		mSubmit.setOnClickListener(this);
 		mRegister.setOnClickListener(this);
-
 	}
 
 	@Override
@@ -122,24 +106,6 @@ public class LoginActivity extends Activity implements OnClickListener {
             int success;
             String username = user.getText().toString();
             String password = pass.getText().toString();
-//            String salt = "";
-//			try {
-//				salt = PasswordEncryptionService.generateSalt().toString();
-//			}
-//			catch (NoSuchAlgorithmException e2) {
-//				// TODO Auto-generated catch block
-//				e2.printStackTrace();
-//			}
-//            try {
-//				encryptedPass = PasswordEncryptionService.getEncryptedPassword(password, salt.getBytes()).toString();
-//			} catch (NoSuchAlgorithmException e1) {
-				// TODO Auto-generated catch block
-//				e1.printStackTrace();
-//			} catch (InvalidKeySpecException e1) {
-//				 TODO Auto-generated catch block
-//				e1.printStackTrace();
-//			}
-            
             try {
                 // Building Parameters
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -149,7 +115,6 @@ public class LoginActivity extends Activity implements OnClickListener {
 //                params.add(new BasicNameValuePair("pass_salt", salt));
 
                 Log.d("request!", "starting");
-                // getting product details by making HTTP request
                 JSONObject json = jsonParser.makeHttpRequest(
                        LOGIN_URL, "POST", params);
 
@@ -163,10 +128,12 @@ public class LoginActivity extends Activity implements OnClickListener {
 //                	Intent i = new Intent(LoginActivity.this, ReadComments.class);
 //                	finish();
 //    				startActivity(i);
-                	return json.getString(TAG_MESSAGE);
+//                	return json.getString(TAG_MESSAGE);
+                	return json.toString();
                 }else{
                 	Log.d("Login Failure!", json.getString(TAG_MESSAGE));
-                	return json.getString(TAG_MESSAGE);
+//                	return json.getString(TAG_MESSAGE);
+                	return json.toString();
 
                 }
             } catch (JSONException e) {
@@ -183,14 +150,12 @@ public class LoginActivity extends Activity implements OnClickListener {
             // dismiss the dialog once product deleted
             pDialog.dismiss();
             if (file_url != null){
-            	Toast.makeText(LoginActivity.this, file_url, Toast.LENGTH_LONG).show();
+            	Toast.makeText(LoginActivity.this, JSonParser.getMessage(file_url), Toast.LENGTH_LONG).show();
             }
-            if(file_url.contains("logged in")) {
+            if(file_url != null && file_url.contains("logged in")) {
             	Intent intent = new Intent(LoginActivity.this, SittersPageActivity.class);
             	startActivity(intent);
             }
         }
-        
-         
 	}
 }

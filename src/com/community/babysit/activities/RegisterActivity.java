@@ -1,7 +1,5 @@
 package com.community.babysit.activities;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +11,6 @@ import org.json.JSONObject;
 import com.community.babysit.R;
 import com.community.babysit.util.GlobalConst.GlobalConstants;
 import com.community.babysit.util.http.JSonParser;
-import com.community.babysit.utils.encryption.PasswordEncryptionService;
 
 import android.support.v7.app.ActionBarActivity;
 import android.app.ProgressDialog;
@@ -54,7 +51,7 @@ public class RegisterActivity extends ActionBarActivity implements
 	// "http://www.yourdomain.com/webservice/register.php";
 
 	// ids
-	private static final String TAG_SUCCESS = "success";
+	private static final String TAG_STATUS = "status";
 	private static final String TAG_MESSAGE = "message";
 
 	@Override
@@ -100,24 +97,24 @@ public class RegisterActivity extends ActionBarActivity implements
 		protected String doInBackground(String... args) {
 			// TODO Auto-generated method stub
 			// Check for success tag
-			int success;
+			int status;
 			String username = user.getText().toString();
 			String password = pass.getText().toString();
-			String salt = "";
-			try {
-				salt = PasswordEncryptionService.generateSalt().toString();
-				encryptedPassword = PasswordEncryptionService.getEncryptedPassword(password, salt.getBytes()).toString();
-			} catch (NoSuchAlgorithmException e2) {
-			} catch (InvalidKeySpecException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+//			String salt = "";
+//			try {
+//				salt = PasswordEncryptionService.generateSalt().toString();
+//				encryptedPassword = PasswordEncryptionService.getEncryptedPassword(password, salt.getBytes()).toString();
+//			} catch (NoSuchAlgorithmException e2) {
+//			} catch (InvalidKeySpecException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 			try {
 				// Building Parameters
 				List<NameValuePair> params = new ArrayList<NameValuePair>();
 				params.add(new BasicNameValuePair("username", username));
-				params.add(new BasicNameValuePair("password", encryptedPassword));
-				params.add(new BasicNameValuePair("pass_salt", salt));
+				params.add(new BasicNameValuePair("password", password));
+//				params.add(new BasicNameValuePair("pass_salt", salt));
 				params.add(new BasicNameValuePair("type", "ADMIN"));
 
 				Log.d("request!", "starting");
@@ -133,14 +130,14 @@ public class RegisterActivity extends ActionBarActivity implements
 				Log.d("Register attempt", json.toString());
 
 				// json success element
-				success = json.getInt(TAG_SUCCESS);
-				if (success == 1) {
+				status = json.getInt(TAG_STATUS);
+				if (status == 1) {
 					Log.d("User Created!", json.toString());
 					finish();
-					return json.getString(TAG_MESSAGE);
+					return json.toString();
 				} else {
 					Log.d("Registeration Failure!", json.getString(TAG_MESSAGE));
-					return json.getString(TAG_MESSAGE);
+					return json.toString();
 
 				}
 			} catch (JSONException e) {
@@ -156,7 +153,7 @@ public class RegisterActivity extends ActionBarActivity implements
 			// dismiss the dialog once product deleted
 			pDialog.dismiss();
 			if (file_url != null) {
-				Toast.makeText(RegisterActivity.this, file_url,
+				Toast.makeText(RegisterActivity.this, JSonParser.getMessage(file_url),
 						Toast.LENGTH_LONG).show();
 			}
 		}

@@ -32,7 +32,6 @@ public class JSonParser {
  
     }
     
-    
     public JSONObject getJSONFromUrl(final String url) {
 
         // Making HTTP request
@@ -89,10 +88,7 @@ public class JSonParser {
         return jObj;
 
     }
-    
  
-    // function get json from url
-    // by making HTTP POST or GET mehtod
     public JSONObject makeHttpRequest(String url, String method,
             List<NameValuePair> params) {
  
@@ -156,6 +152,16 @@ public class JSonParser {
  
         // return JSON String
         return jObj;
- 
+    }
+    
+    public static String getMessage(String jsonString) {
+    	String message = "";
+    	JSONObject jsonMsg;
+    	try {
+    		jsonMsg = new JSONObject(jsonString);
+    		return jsonMsg.getString("message");
+         } catch (JSONException e) {
+         	return message;
+         }
     }
 }
